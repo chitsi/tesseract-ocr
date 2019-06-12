@@ -24,7 +24,7 @@ public class CMDMain {
 	static {
 		try {
 			pm = PropertiesMgr.getInstance();
-			System.setProperty("file.encoding", pm.get(PropertiesMgr.DEFAULT_BUNDLE, "outputFileEncoding"));
+			System.setProperty("file.encoding", pm.get(null, "outputFileEncoding"));
 		} catch (IOException e) {
 			System.err.println(e.getMessage());
 			e.printStackTrace(System.err);
@@ -32,21 +32,26 @@ public class CMDMain {
 	}
 
 	public static void main(final String[] args) throws FileNotFoundException, TesseractException, IOException {
-		final String imagesFolder = su.concat(".", File.separator, "input", File.separator, "images");
+		final String imagesFolder = su.concat(".", File.separator, "workspace", File.separator, "images");
 		// Read list of files.
 		final File[] files = FileUtil.readNonDirectoriesByDate(imagesFolder);
 		// perform OCR on all files.
-		ocr(files, imagesFolder);
+		ocr(files);
 	}
 
-	private static void ocr(final File[] files, final String inputFolder)
-			throws TesseractException, FileNotFoundException, IOException {
+	private static void ocr(final File[] files) throws TesseractException, FileNotFoundException, IOException {
 		final Tesseract tesseract = new Tesseract();
-		tesseract.setLanguage(pm.get(PropertiesMgr.DEFAULT_BUNDLE, "ocrLanguage"));
-		tesseract.setDatapath(pm.get(PropertiesMgr.DEFAULT_BUNDLE, "tesseractDir"));
+		tesseract.setLanguage(pm.get(null, "ocrLanguage"));
+		tesseract.setDatapath(pm.get(null, "tesseractDir"));
 		int count = 0;
+		File outputDir = new File(su.concat(".", File.separator, "workspace", File.separator, "output"));
+		if (!outputDir.exists() || !outputDir.isDirectory()) {
+			// create .\workspace\output if not present.
+			outputDir.mkdir();
+		}
 		String name;
-		try (FileOutputStream fos = new FileOutputStream(su.concat(inputFolder, File.separator, "output.txt"));) {
+		try (FileOutputStream fos = new FileOutputStream(
+				su.concat(".", File.separator, "workspace", File.separator, "output", File.separator, "output.txt"));) {
 			for (final File file : files) {
 				if (!file.isDirectory()) {
 					name = file.getName();

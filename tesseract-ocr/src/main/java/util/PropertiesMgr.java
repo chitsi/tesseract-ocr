@@ -28,8 +28,8 @@ public class PropertiesMgr {
 		// \input\properties\input-do-not-del.properties is expected for sure.
 		final Properties defaultProperties = new Properties();
 
-		String propFile = su.concat(".", File.separator, "input", File.separator, "properties", File.separator,
-				"input-do-not-del.properties");
+		final String propFile = su.concat(".", File.separator, "workspace", File.separator, "properties",
+				File.separator, "input-do-not-del.properties");
 		try (FileInputStream inStream = new FileInputStream(propFile);) {
 			defaultProperties.load(inStream);
 		}
@@ -48,7 +48,8 @@ public class PropertiesMgr {
 		return PROPERTIES_MGR;
 	}
 
-	public String get(final String bundle, final String key) {
+	public String get(String bundle, final String key) {
+		bundle = (bundle == null ? PropertiesMgr.DEFAULT_BUNDLE : bundle);
 		final Properties properties = propertiesMap.get(bundle);
 		return properties != null ? properties.getProperty(key) : null;
 	}
