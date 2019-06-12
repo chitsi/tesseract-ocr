@@ -34,7 +34,7 @@ public class CMDMain {
 	public static void main(final String[] args) throws FileNotFoundException, TesseractException, IOException {
 		final String imagesFolder = su.concat(".", File.separator, "input", File.separator, "images");
 		// Read list of files.
-		final File[] files = FileUtil.readNonDirectories(imagesFolder);
+		final File[] files = FileUtil.readNonDirectoriesByDate(imagesFolder);
 		// perform OCR on all files.
 		ocr(files, imagesFolder);
 	}
