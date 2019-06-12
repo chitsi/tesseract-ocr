@@ -42,8 +42,8 @@ public class CMDMain {
 	private static void ocr(final File[] files, final String inputFolder)
 			throws TesseractException, FileNotFoundException, IOException {
 		final Tesseract tesseract = new Tesseract();
-		tesseract.setLanguage("tel");
-		tesseract.setDatapath("C:\\Users\\Sanjaya\\Documents\\tessdata-tel");
+		tesseract.setLanguage(pm.get(PropertiesMgr.DEFAULT_BUNDLE, "ocrLanguage"));
+		tesseract.setDatapath(pm.get(PropertiesMgr.DEFAULT_BUNDLE, "tesseractDir"));
 		int count = 0;
 		String name;
 		try (FileOutputStream fos = new FileOutputStream(su.concat(inputFolder, File.separator, "output.txt"));) {
