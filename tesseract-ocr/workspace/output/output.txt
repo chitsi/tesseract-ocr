@@ -1,2 +1,1 @@
-=====sample-delete-this.png=====
-This is only a sample file, and can be deleted. System regenerates this new for each run.
+abcd

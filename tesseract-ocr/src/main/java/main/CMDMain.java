@@ -3,18 +3,22 @@
  */
 package main;
 
+import static org.bytedeco.javacpp.opencv_imgcodecs.cvLoadImage;
+
+import java.awt.image.BufferedImage;
 import java.io.BufferedOutputStream;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStreamWriter;
 import java.net.URL;
 import java.net.URLConnection;
 
-import com.itextpdf.text.pdf.codec.Base64.OutputStream;
+import org.bytedeco.javacpp.avcodec;
+import org.bytedeco.javacpp.opencv_core.IplImage;
+import org.bytedeco.javacv.FFmpegFrameRecorder;
+import org.bytedeco.javacv.OpenCVFrameConverter;
 
 import file.FileUtil;
 import net.sourceforge.tess4j.Tesseract;
@@ -39,14 +43,44 @@ public class CMDMain {
 		}
 	}
 
-	public static void main(final String[] args) throws FileNotFoundException, TesseractException, IOException {
-		final String imagesFolder = su.concat(".", File.separator, "workspace", File.separator, "images");
+	public static void main(String[] args) throws FileNotFoundException, TesseractException, IOException {
+		main1(args);
+//		convertJPGtoMovie("C:\\Users\\Sanjaya\\Documents\\siva\\tesseract\\tesseract-ocr\\TextToImage");
+	}
+
+	public static void main1(final String[] args) throws FileNotFoundException, TesseractException, IOException {
+//		final String imagesFolder = su.concat(".", File.separator, "workspace", File.separator, "images");
+//		final String imagesFolder = su.concat("C:\\Users\\Sanjaya\\Pictures\\Greenshot");
+		final String imagesFolder = pm.get(null, "imagesFolder");
 		// Check and download training data if not already present.
 		downloadTrainingData();
 		// Read list of files.
 		final File[] files = FileUtil.readNonDirectoriesByDate(imagesFolder);
 		// perform OCR on all files.
 		ocr(files);
+	}
+
+	public static void convertJPGtoMovie(String vidPath) {
+		OpenCVFrameConverter.ToIplImage grabberConverter = new OpenCVFrameConverter.ToIplImage();
+		FFmpegFrameRecorder recorder = new FFmpegFrameRecorder(vidPath+"\\1.mp4", 640, 720);
+		try {
+			recorder.setFrameRate(1);
+			recorder.setVideoCodec(avcodec.AV_CODEC_ID_MPEG4);
+			recorder.setVideoBitrate(9000);
+			recorder.setFormat("mp4");
+			recorder.setVideoQuality(0); // maximum quality
+			recorder.start();
+			BufferedImage img;
+			IplImage origImg;
+			for (int i = 1; i < 167; i++) {
+//				img = ImageIO.read(new File(vidPath + "-" + i));
+//				origImg = IplImage.createFrom(img);
+				recorder.record(grabberConverter.convert(cvLoadImage(vidPath + "Mukka-" + i + ".png")));
+			}
+			recorder.stop();
+		} catch (org.bytedeco.javacv.FrameRecorder.Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	private static void downloadTrainingData() throws IOException {
@@ -88,7 +122,7 @@ public class CMDMain {
 		}
 		String name;
 		try (FileOutputStream fos = new FileOutputStream(
-				su.concat(".", File.separator, "workspace", File.separator, "output", File.separator, "output.txt"));) {
+				su.concat(".", File.separator, "workspace", File.separator, "output", File.separator, "output.txt"),true);) {
 			for (final File file : files) {
 				if (!file.isDirectory()) {
 					name = file.getName();
@@ -99,6 +133,7 @@ public class CMDMain {
 					System.out.println("Done with [" + count + "/" + files.length + "]");
 				}
 			}
+			fos.flush();
 		}
 	}
 }
